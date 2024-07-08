@@ -213,6 +213,9 @@ func (sa *sendAmount) handle() {
 	if sa.SendMax {
 		sa.amountEditor.CustomButton.Background = sa.theme.Color.Primary
 		sa.usdAmountEditor.CustomButton.Background = sa.theme.Color.Primary
+
+		sa.validateAmount()
+		sa.amountChanged()
 	} else if len(sa.amountEditor.Editor.Text()) < 1 || !sa.SendMax {
 		sa.amountEditor.CustomButton.Background = sa.theme.Color.Gray1
 		sa.usdAmountEditor.CustomButton.Background = sa.theme.Color.Gray1

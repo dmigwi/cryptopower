@@ -354,7 +354,7 @@ func (pg *Page) constructTx() {
 		return
 	}
 
-	totalCost, balanceAfterSend, totalAmount, err := pg.addSendDestination()
+	totalCost, balanceAfterSend, totalAmount, err := pg.getSendDestinations()
 	if err != nil {
 		return
 	}
@@ -394,9 +394,8 @@ func (pg *Page) constructTx() {
 	}
 }
 
-func (pg *Page) addSendDestination() (sharedW.AssetAmount, sharedW.AssetAmount, int64, error) {
-	var totalCost int64
-
+func (pg *Page) getSendDestinations() (totalCost sharedW.AssetAmount,
+	balanceAfterSend sharedW.AssetAmount, totalSendAmount int64, err error) {
 	sourceAccount := pg.sourceAccountSelector.SelectedAccount()
 	selectedUTXOs := make([]*sharedW.UnspentOutput, 0)
 	if sourceAccount == pg.selectedUTXOs.sourceAccount {
@@ -414,8 +413,8 @@ func (pg *Page) addSendDestination() (sharedW.AssetAmount, sharedW.AssetAmount, 
 		spendableAmount = pg.selectedUTXOs.totalUTXOsAmount
 	}
 
-	wal := pg.selectedWallet
-	var totalSendAmount int64
+	var totalRawCost int64
+	// var totalSendAmount int64
 	for _, recipient := range pg.recipients {
 		destinationAddress := recipient.destinationAddress()
 		amountAtom, SendMax := recipient.validAmount()
@@ -436,11 +435,13 @@ func (pg *Page) addSendDestination() (sharedW.AssetAmount, sharedW.AssetAmount, 
 		}
 		totalSendAmount += amountAtom
 		cost := amountAtom + feeAtom
-		totalCost += cost
+		totalRawCost += cost
 	}
-	balanceAfterSend := wal.ToAmount(spendableAmount - totalCost)
-	return wal.ToAmount(totalCost), balanceAfterSend, totalSendAmount, nil
 
+	totalCost = pg.selectedWallet.ToAmount(totalRawCost)
+	balanceAfterSend = pg.selectedWallet.ToAmount(spendableAmount - totalRawCost)
+
+	return
 }
 
 func (pg *Page) isAllRecipientValidated() bool {
