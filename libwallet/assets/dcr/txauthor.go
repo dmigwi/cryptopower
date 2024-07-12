@@ -189,24 +189,24 @@ func (asset *Asset) EstimateFeeAndSize() (*sharedW.TxFeeAndSize, error) {
 	}, nil
 }
 
-func (asset *Asset) EstimateMaxSendAmount() (*sharedW.Amount, error) {
-	txFeeAndSize, err := asset.EstimateFeeAndSize()
-	if err != nil {
-		return nil, err
-	}
+// func (asset *Asset) EstimateMaxSendAmount() (*sharedW.Amount, error) {
+// 	txFeeAndSize, err := asset.EstimateFeeAndSize()
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	spendableAccountBalance, err := asset.SpendableForAccount(int32(asset.TxAuthoredInfo.sourceAccountNumber))
-	if err != nil {
-		return nil, err
-	}
+// 	spendableAccountBalance, err := asset.SpendableForAccount(int32(asset.TxAuthoredInfo.sourceAccountNumber))
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	maxSendableAmount := spendableAccountBalance - txFeeAndSize.Fee.UnitValue
+// 	maxSendableAmount := spendableAccountBalance - txFeeAndSize.Fee.UnitValue
 
-	return &sharedW.Amount{
-		UnitValue: maxSendableAmount,
-		CoinValue: dcrutil.Amount(maxSendableAmount).ToCoin(),
-	}, nil
-}
+// 	return &sharedW.Amount{
+// 		UnitValue: maxSendableAmount,
+// 		CoinValue: dcrutil.Amount(maxSendableAmount).ToCoin(),
+// 	}, nil
+// }
 
 func (asset *Asset) Broadcast(privatePassphrase, transactionLabel string) ([]byte, error) {
 	if !asset.WalletOpened() {

@@ -251,29 +251,29 @@ func (asset *Asset) EstimateFeeAndSize() (*sharedW.TxFeeAndSize, error) {
 	}, nil
 }
 
-// EstimateMaxSendAmount estimates the maximum amount that can be sent in the transaction.
-func (asset *Asset) EstimateMaxSendAmount() (*sharedW.Amount, error) {
-	txFeeAndSize, err := asset.EstimateFeeAndSize()
-	if err != nil {
-		return nil, err
-	}
+// // EstimateMaxSendAmount estimates the maximum amount that can be sent in the transaction.
+// func (asset *Asset) EstimateMaxSendAmount() (*sharedW.Amount, error) {
+// 	txFeeAndSize, err := asset.EstimateFeeAndSize()
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	if asset.TxAuthoredInfo == nil {
-		return nil, fmt.Errorf("TxAuthoredInfo is nil")
-	}
+// 	if asset.TxAuthoredInfo == nil {
+// 		return nil, fmt.Errorf("TxAuthoredInfo is nil")
+// 	}
 
-	spendableAccountBalance, err := asset.SpendableForAccount(int32(asset.TxAuthoredInfo.sourceAccountNumber))
-	if err != nil {
-		return nil, err
-	}
+// 	spendableAccountBalance, err := asset.SpendableForAccount(int32(asset.TxAuthoredInfo.sourceAccountNumber))
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	maxSendableAmount := spendableAccountBalance - txFeeAndSize.Fee.UnitValue
+// 	maxSendableAmount := spendableAccountBalance - txFeeAndSize.Fee.UnitValue
 
-	return &sharedW.Amount{
-		UnitValue: maxSendableAmount,
-		CoinValue: btcutil.Amount(maxSendableAmount).ToBTC(),
-	}, nil
-}
+// 	return &sharedW.Amount{
+// 		UnitValue: maxSendableAmount,
+// 		CoinValue: btcutil.Amount(maxSendableAmount).ToBTC(),
+// 	}, nil
+// }
 
 // Broadcast broadcasts the transaction to the network.
 func (asset *Asset) Broadcast(privatePassphrase, transactionLabel string) ([]byte, error) {

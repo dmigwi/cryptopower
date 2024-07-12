@@ -9,6 +9,7 @@ import (
 	"github.com/btcsuite/btcd/btcutil"
 	"github.com/crypto-power/cryptopower/libwallet/assets/btc"
 	"github.com/crypto-power/cryptopower/libwallet/assets/dcr"
+	"github.com/crypto-power/cryptopower/libwallet/assets/ltc"
 	libUtil "github.com/crypto-power/cryptopower/libwallet/utils"
 	"github.com/crypto-power/cryptopower/ui/cryptomaterial"
 	"github.com/crypto-power/cryptopower/ui/utils"
@@ -23,8 +24,8 @@ type sendAmount struct {
 	amountEditor    cryptomaterial.Editor
 	usdAmountEditor cryptomaterial.Editor
 
-	SendMax               bool
-	sendMaxChangeEvent    bool
+	// SendMax               bool
+	// sendMaxChangeEvent    bool
 	usdSendMaxChangeEvent bool
 	amountChanged         func()
 
@@ -111,20 +112,25 @@ func (sa *sendAmount) amountIsValid() bool {
 	return err == nil && amountEditorErrors
 }
 
-func (sa *sendAmount) validAmount() (int64, bool, error) {
-	if sa.SendMax {
-		return 0, sa.SendMax, nil
-	}
-
-	amount, err := strconv.ParseFloat(sa.amountEditor.Editor.Text(), 64)
+// validAmount parses through the amount user input to confirm a numerical
+// value was input by the user. The valid numerical value is converted to the
+// coin's granular unit. i.e. BTC Amount is converted to Satoshis, LTC Amount
+// is converted to Litoshis and DCR Amount is converted to DCR atoms.
+// If an error is detected the returned granular unit amount is set to -1.
+func (sa *sendAmount) validAmount() (amount int64, err error) {
+	rawAmount, err := strconv.ParseFloat(sa.amountEditor.Editor.Text(), 64)
 	if err != nil {
-		return -1, sa.SendMax, err
+		return -1, err
 	}
 
-	if sa.assetType == libUtil.BTCWalletAsset {
-		return btc.AmountSatoshi(amount), sa.SendMax, nil
+	switch sa.assetType {
+	case libUtil.BTCWalletAsset:
+		return btc.AmountSatoshi(rawAmount), nil
+	case libUtil.LTCWalletAsset:
+		return ltc.AmountLitoshi(rawAmount), nil
+	default:
+		return dcr.AmountAtom(rawAmount), nil
 	}
-	return dcr.AmountAtom(amount), sa.SendMax, nil
 }
 
 func (sa *sendAmount) validateAmount() {
